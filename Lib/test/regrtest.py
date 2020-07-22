@@ -358,7 +358,7 @@ def main(tests=None, testdir=None, verbose=0, quiet=False,
              'findleaks',
              'use=', 'threshold=', 'trace', 'coverdir=', 'nocoverdir',
              'runleaks', 'huntrleaks=', 'memlimit=', 'randseed=',
-             'multiprocess=', 'slaveargs=', 'forever', 'header', 'pgo',
+             'multiprocess=', 'subordinateargs=', 'forever', 'header', 'pgo',
              'failfast', 'match=', 'testdir=', 'list-tests', 'list-cases',
              'coverage', 'matchfile=', 'fail-env-changed'])
     except getopt.error, msg:
@@ -369,7 +369,7 @@ def main(tests=None, testdir=None, verbose=0, quiet=False,
         random_seed = random.randrange(10000000)
     if use_resources is None:
         use_resources = []
-    slaveargs = None
+    subordinateargs = None
     list_tests = False
     list_cases_opt = False
     fail_env_changed = False
@@ -463,8 +463,8 @@ def main(tests=None, testdir=None, verbose=0, quiet=False,
             use_mp = int(a)
         elif o == '--header':
             header = True
-        elif o == '--slaveargs':
-            slaveargs = a
+        elif o == '--subordinateargs':
+            subordinateargs = a
         elif o in ('-P', '--pgo'):
             pgo = True
         elif o == '--testdir':
@@ -503,8 +503,8 @@ def main(tests=None, testdir=None, verbose=0, quiet=False,
         except ValueError:
             pass
 
-    if slaveargs is not None:
-        args, kwargs = json.loads(slaveargs)
+    if subordinateargs is not None:
+        args, kwargs = json.loads(subordinateargs)
         if kwargs['huntrleaks']:
             warm_caches()
         if testdir:
@@ -713,7 +713,7 @@ def main(tests=None, testdir=None, verbose=0, quiet=False,
                     return True
 
                 # -E is needed by some tests, e.g. test_import
-                args = base_cmd + ['--slaveargs', json.dumps(args_tuple)]
+                args = base_cmd + ['--subordinateargs', json.dumps(args_tuple)]
                 if testdir:
                     args.extend(('--testdir', testdir))
                 try:
@@ -1513,7 +1513,7 @@ def clear_caches():
     except KeyError:
         pass
     else:
-        doctest.master = None
+        doctest.main = None
 
     try:
         ctypes = sys.modules['ctypes']
